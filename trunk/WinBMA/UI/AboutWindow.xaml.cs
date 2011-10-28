@@ -37,7 +37,14 @@ namespace WinBMA.UI
             TEXT_License.Text = Utilities.TextResourceReader.GetFromResources("/WinBMA;component/Resources/License.txt");
 
             LINK_HomePage.Click += new RoutedEventHandler(LINK_HomePage_Click);
+
+            BUTTON_Donate.Click += new RoutedEventHandler(BUTTON_Donate_Click);
             BUTTON_Ok.Click += new RoutedEventHandler(BUTTON_Ok_Click);
+        }
+
+        private void BUTTON_Donate_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=andrewm.finewolf@gmail.com&item_name=WinBMA%20Donation&currency_code=CAD&bn=PP%2dDonationsBF");
         }
 
         private void BUTTON_Ok_Click(object sender, RoutedEventArgs e)

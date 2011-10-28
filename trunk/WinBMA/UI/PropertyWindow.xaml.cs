@@ -77,6 +77,9 @@ namespace WinBMA.UI
             TEXT_RestoreCode.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(TEXT_PreviewMouseLeftButtonDown);
             TEXT_AuthCode.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(TEXT_PreviewMouseLeftButtonDown);
 
+            TEXT_TokenHex.PreviewMouseDown += new MouseButtonEventHandler(TEXT_PreviewMouseLeftButtonDown);
+            TEXT_TokenBase64.PreviewMouseDown += new MouseButtonEventHandler(TEXT_PreviewMouseLeftButtonDown);
+
             TABCONTROL.SelectionChanged += new SelectionChangedEventHandler(TABCONTROL_SelectionChanged);
             TEXT_Delete.TextChanged += new TextChangedEventHandler(TEXT_Delete_TextChanged);
 

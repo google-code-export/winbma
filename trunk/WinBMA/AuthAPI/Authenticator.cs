@@ -316,7 +316,7 @@ namespace WinBMA.AuthAPI
                 _token = (byte[])_decryptedToken.Clone();
             }
 
-            byte[] encryptedToken = Security.EncryptionProvider.Encrypt(DecryptedToken, encType, userPassword);
+            byte[] encryptedToken = Security.EncryptionProvider.Encrypt((byte[])_decryptedToken.Clone(), encType, userPassword);
 
             if (encryptedToken == null)
                 return false;
@@ -366,7 +366,7 @@ namespace WinBMA.AuthAPI
 
             this.Name = name;
             this.Serial = serial;
-            this.Token = token;
+            this.Token = (byte[])token.Clone();
 
             this.EncryptionType = encryptionType;
 
