@@ -1,0 +1,8 @@
+﻿<Window x:Class="WinBMA.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wc="clr-namespace:WinBMA.UI.Controls"
+        Title="WinBMA" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen"
+        Icon="/WinBMA;component/Resources/Images/Icons/WinBMA.ico">
+    <wc:AuthenticatorPanel x:Name="AuthPanel"></wc:AuthenticatorPanel>
+</Window>

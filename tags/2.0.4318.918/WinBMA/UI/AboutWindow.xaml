@@ -1,0 +1,47 @@
+﻿<Window x:Class="WinBMA.UI.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="About WinBMA"
+        Icon="/WinBMA;component/Resources/Images/Icons/WinBMA.ico"
+        ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        SizeToContent="Height" Width="450">
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Grid.Row="0">
+            <StackPanel Margin="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image Source="/WinBMA;component/Resources/Images/Icons/WinBMA.ico" />
+
+                    <StackPanel Margin="5,0,0,0" Grid.Column="1">
+                        <TextBlock FontWeight="Bold" FontSize="16" Grid.Row="0">About WinBMA</TextBlock>
+                        <TextBlock FontSize="10"><TextBlock FontWeight="Bold" x:Name="TEXTBLOCK_Version">VersionNumber</TextBlock> - Compiled on <TextBlock x:Name="TEXTBLOCK_BuildDate">BuildDate</TextBlock></TextBlock>
+                    </StackPanel>
+                </Grid>
+                <TextBlock Margin="0,12,0,0" TextWrapping="Wrap">
+                    <Hyperlink x:Name="LINK_HomePage">http://code.google.com/p/winbma/</Hyperlink><LineBreak />
+                    <Bold>Created by:</Bold> Andrew Moore<LineBreak />
+                    <LineBreak />
+                    <Bold>Licensed under the MIT License:</Bold>
+                </TextBlock>
+
+                <TextBox FontFamily="Courier New" Margin="0,6,0,0" x:Name="TEXT_License" Height="150" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" IsReadOnlyCaretVisible="False" VerticalScrollBarVisibility="Visible" />
+            </StackPanel>
+        </Grid>
+
+        <Separator Grid.Row="1" />
+
+        <StackPanel Margin="5" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2">
+            <Button x:Name="BUTTON_Ok" Padding="4,2" Margin="4,0,0,0" IsDefault="True" MinWidth="81" Content="Close" />
+        </StackPanel>
+    </Grid>
+</Window>
