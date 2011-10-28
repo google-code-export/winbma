@@ -68,9 +68,9 @@ namespace WinBMA.UI
                 if (encryptionType != AuthAPI.Security.EncryptionProvider.EncryptionType.None)
                 {
                     bgWorker.ReportProgress(1, "Encrypting Authenticator...");
-
-                    newAuthenticator.Encrypt(encryptionType, userPassword);
                 }
+
+                newAuthenticator.Encrypt(encryptionType, userPassword);
 
                 bgWorker.ReportProgress(2, "Saving Authenticator to File...");
 
