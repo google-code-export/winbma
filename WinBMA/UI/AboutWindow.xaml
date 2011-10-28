@@ -27,21 +27,88 @@
                         <TextBlock FontSize="10"><TextBlock FontWeight="Bold" x:Name="TEXTBLOCK_Version">VersionNumber</TextBlock> - Compiled on <TextBlock x:Name="TEXTBLOCK_BuildDate">BuildDate</TextBlock></TextBlock>
                     </StackPanel>
                 </Grid>
-                <TextBlock Margin="0,12,0,0" TextWrapping="Wrap">
-                    <Hyperlink x:Name="LINK_HomePage">http://code.google.com/p/winbma/</Hyperlink><LineBreak />
-                    <Bold>Created by:</Bold> Andrew Moore<LineBreak />
-                    <LineBreak />
-                    <Bold>Licensed under the MIT License:</Bold>
+
+                <Grid Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0">
+                        <Hyperlink x:Name="LINK_HomePage">http://code.google.com/p/winbma/</Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Right">
+                          <Bold>Created by:</Bold> Andrew Moore
+                    </TextBlock>
+                </Grid>
+
+                <TextBlock Margin="0,6,0,0" TextWrapping="Wrap">
+                    WinBMA is a Windows based Battle.net Authenticator which allows people who don't have access to a smartphone supported by the official BMA to still be protected by an authenticator.
                 </TextBlock>
 
-                <TextBox FontFamily="Courier New" Margin="0,6,0,0" x:Name="TEXT_License" Height="150" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" IsReadOnlyCaretVisible="False" VerticalScrollBarVisibility="Visible" />
+                <TextBox FontFamily="Courier New" Margin="0,24,0,0" x:Name="TEXT_License" Height="120" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" IsReadOnlyCaretVisible="False" VerticalScrollBarVisibility="Visible" />
             </StackPanel>
         </Grid>
 
         <Separator Grid.Row="1" />
 
+        <Grid Margin="5" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BUTTON_Donate" FontWeight="Bold" Foreground="#003366" FontStyle="Italic" Padding="4,2" Content="Donate via PayPal" MinWidth="81" Grid.Column="0">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="STYLE_Bg_Border" SnapsToDevicePixels="True" BorderThickness="1" CornerRadius="3">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#FFFDF9" Offset="0" />
+                                        <GradientStop Color="#FEDE9F" Offset="0.5" />
+                                        <GradientStop Color="#FFAF34" Offset="0.5" />
+                                        <GradientStop Color="#FFEDCC" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+
+                            <Border SnapsToDevicePixels="True" BorderBrush="#FF9933" CornerRadius="3" BorderThickness="1">
+                                <ContentControl Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="STYLE_Bg_Border"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="0.6" Duration="0:0:0:0.15" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="STYLE_Bg_Border"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="1" Duration="0:0:0:0.15" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button x:Name="BUTTON_Ok" Padding="4,2" IsDefault="True" MinWidth="81" Content="Close" HorizontalAlignment="Right" Grid.Column="1" />
+        </Grid>
         <StackPanel Margin="5" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2">
-            <Button x:Name="BUTTON_Ok" Padding="4,2" Margin="4,0,0,0" IsDefault="True" MinWidth="81" Content="Close" />
+
         </StackPanel>
     </Grid>
 </Window>

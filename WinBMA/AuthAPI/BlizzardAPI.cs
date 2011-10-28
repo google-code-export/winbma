@@ -27,6 +27,10 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Parameters;
+using BouncyCastleBigInteger = Org.BouncyCastle.Math.BigInteger;
+
 namespace WinBMA.AuthAPI
 {
     public static class BlizzardAPI
@@ -42,24 +46,12 @@ namespace WinBMA.AuthAPI
         private static string ENDPOINT_RESTORE = "/enrollment/initiatePaperRestore.htm";
         private static string ENDPOINT_RESTOREVALIDATE = "/enrollment/validatePaperRestore.htm";
         private static string ENDPOINT_SYNC = "/enrollment/time.htm";
-        private static byte[] ENROLL_RSA_EXPONENT = { 0x01, 0x01 };
 
-        private static byte[] ENROLL_RSA_MODULUS = {0x95, 0x5e, 0x4b, 0xd9, 0x89, 0xf3, 0x91, 0x7d,
-                                                    0x2f, 0x15, 0x54, 0x4a, 0x7e, 0x05, 0x04, 0xeb,
-                                                    0x9d, 0x7b, 0xb6, 0x6b, 0x6f, 0x8a, 0x2f, 0xe4,
-                                                    0x70, 0xe4, 0x53, 0xc7, 0x79, 0x20, 0x0e, 0x5e,
-                                                    0x3a, 0xd2, 0xe4, 0x3a, 0x02, 0xd0, 0x6c, 0x4a,
-                                                    0xdb, 0xd8, 0xd3, 0x28, 0xf1, 0xa4, 0x26, 0xb8,
-                                                    0x36, 0x58, 0xe8, 0x8b, 0xfd, 0x94, 0x9b, 0x2a,
-                                                    0xf4, 0xea, 0xf3, 0x00, 0x54, 0x67, 0x3a, 0x14,
-                                                    0x19, 0xa2, 0x50, 0xfa, 0x4c, 0xc1, 0x27, 0x8d,
-                                                    0x12, 0x85, 0x5b, 0x5b, 0x25, 0x81, 0x8d, 0x16,
-                                                    0x2c, 0x6e, 0x6e, 0xe2, 0xab, 0x4a, 0x35, 0x0d,
-                                                    0x40, 0x1d, 0x78, 0xf6, 0xdd, 0xb9, 0x97, 0x11,
-                                                    0xe7, 0x26, 0x26, 0xb4, 0x8b, 0xd8, 0xb5, 0xb0,
-                                                    0xb7, 0xf3, 0xac, 0xf9, 0xea, 0x3c, 0x9e, 0x00,
-                                                    0x05, 0xfe, 0xe5, 0x9e, 0x19, 0x13, 0x6c, 0xdb,
-                                                    0x7c, 0x83, 0xf2, 0xab, 0x8b, 0x0a, 0x2a, 0x99};
+        private static string ENROLL_RSA_EXPONENT = "0101";
+        private static string ENROLL_RSA_MODULUS = "955e4bd989f3917d2f15544a7e0504eb9d7bb66b6f8a2fe470e453c779200e5e" +
+                                                   "3ad2e43a02d06c4adbd8d328f1a426b83658e88bfd949b2af4eaf30054673a14" +
+                                                   "19a250fa4cc1278d12855b5b25818d162c6e6ee2ab4a350d401d78f6ddb99711" +
+                                                   "e72626b48bd8b5b0b7f3acf9ea3c9e0005fee59e19136cdb7c83f2ab8b0a2a99";
 
         private static Int64 LocalUnixTime
         {
@@ -122,12 +114,15 @@ namespace WinBMA.AuthAPI
 
         private static byte[] EncryptRSAPayload(byte[] payload)
         {
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(new RSAParameters { Exponent = ENROLL_RSA_EXPONENT, Modulus = ENROLL_RSA_MODULUS });
-            return rsa.Encrypt(payload, false);
+            //! NOTE: I am using BouncyCastle/RSAEngine due to the fact that RSACryptoServiceProvider will
+            //        not let you encrypt without padding.
+
+            RsaEngine rsaCryptoProvider = new RsaEngine();
+            rsaCryptoProvider.Init(true, new RsaKeyParameters(false, new BouncyCastleBigInteger(ENROLL_RSA_MODULUS, 16), new BouncyCastleBigInteger(ENROLL_RSA_EXPONENT, 16)));
+            return rsaCryptoProvider.ProcessBlock(payload, 0, payload.Length);
         }
 
-        private static byte[] GetRandomBytes(int numberOfBytes)
+        private static byte[] GetRandomBytes(int numberOfBytes, bool printableOnly = false)
         {
             if (rng == null)
                 rng = new RNGCryptoServiceProvider();
@@ -135,6 +130,20 @@ namespace WinBMA.AuthAPI
             byte[] buffer = new byte[numberOfBytes];
 
             rng.GetBytes(buffer);
+
+            if (printableOnly)
+            {
+                for (int i = 0; i < numberOfBytes; i++)
+                {
+                    buffer[i] = (byte)((buffer[i] % 62) + 48); // Numeric
+
+                    if (buffer[i] > 57)
+                        buffer[i] += 7; // Go In Upper Case
+
+                    if (buffer[i] > 90)
+                        buffer[i] += 6; // Go In Lower Case
+                }
+            }
 
             return buffer;
         }
@@ -190,7 +199,7 @@ namespace WinBMA.AuthAPI
                     plainTextStream.Write(new byte[] { 0x0, 0x0 }, 0, 2);
                 }
 
-                plainTextStream.Write(Encoding.UTF8.GetBytes(UserAgent), 0, UserAgent.Length);
+                plainTextStream.Write(GetRandomBytes(16, true), 0, 16);
 
                 plainTextRequest = plainTextStream.ToArray();
             }
@@ -241,16 +250,17 @@ namespace WinBMA.AuthAPI
 
             Settings.SettingsDatabase.ServerTimeOffset = CalculateOffset(serverTime);
 
+            // Serial
+            string serial = Encoding.Default.GetString(responseData, 8, 17);
+
             // Token
             byte[] token = new byte[20];
             Array.Copy(responseData, 25, token, 0, 20);
+
             for (int i = xorRequestKey.Length - 1; i >= 0; i--)
             {
                 token[i] ^= xorRequestKey[i];
             }
-
-            // Serial
-            string serial = Encoding.Default.GetString(responseData, 8, 17);
 
             return new Authenticator(serial, token);
         }

@@ -113,7 +113,15 @@ namespace WinBMA.UI
         private void TEXT_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            Clipboard.SetText(textBox.Text);
+
+            if (textBox == TEXT_Serial)
+            {
+                Clipboard.SetText(textBox.Text.Replace("-", ""));
+            }
+            else
+            {
+                Clipboard.SetText(textBox.Text);
+            }
         }
     }
 }
