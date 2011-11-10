@@ -47,6 +47,9 @@
     <Reference Include="BouncyCastle.Crypto">
       <HintPath>ReferencedAssemblies\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
+    <Reference Include="InputSimulator">
+      <HintPath>ReferencedAssemblies\InputSimulator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Security" />
@@ -76,6 +79,9 @@
     <Compile Include="UI\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\EditHotKeyWindow.xaml.cs">
+      <DependentUpon>EditHotKeyWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\UpdateAvailableWindow.xaml.cs">
       <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
     </Compile>
@@ -99,7 +105,10 @@
     </Compile>
     <Compile Include="Utilities\CombiningConverter.cs" />
     <Compile Include="Utilities\HexInspector.cs" />
+    <Compile Include="Utilities\Keys.cs" />
     <Compile Include="Utilities\PasswordBoxAssistant.cs" />
+    <Compile Include="Utilities\SystemHotKey.cs" />
+    <Compile Include="Utilities\SystemHotKeyEventArgs.cs" />
     <Compile Include="Utilities\TextResourceReader.cs" />
     <Compile Include="Utilities\UpdateChecker.cs" />
     <Page Include="Resources\Themes\BattleNet\BattleNet.xaml">
@@ -119,6 +128,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\AboutWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\EditHotKeyWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

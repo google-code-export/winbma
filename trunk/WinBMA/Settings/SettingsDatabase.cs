@@ -24,6 +24,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using WinBMA.Utilities;
 
 namespace WinBMA.Settings
 {
@@ -103,6 +105,72 @@ namespace WinBMA.Settings
             set
             {
                 _checkForUpdates = value;
+            }
+        }
+
+        private static Keys _hotkey;
+
+        public static Keys Hotkey
+        {
+            get
+            {
+                return _hotkey;
+            }
+            set
+            {
+                _hotkey = value;
+            }
+        }
+
+        private static bool _hotkeyEnabled;
+
+        private static SystemHotKey.ModifierKeys _hotkeyModifiers;
+
+        public static SystemHotKey.ModifierKeys HotkeyModifiers
+        {
+            get
+            {
+                return _hotkeyModifiers;
+            }
+            set
+            {
+                _hotkeyModifiers = value;
+            }
+        }
+
+        public static string HotkeyString
+        {
+            get
+            {
+                StringBuilder builder = new StringBuilder();
+
+                if (HotkeyModifiers.HasFlag(SystemHotKey.ModifierKeys.Control))
+                    builder.Append("CTRL + ");
+
+                if (HotkeyModifiers.HasFlag(SystemHotKey.ModifierKeys.Control))
+                    builder.Append("SHIFT + ");
+
+                if (HotkeyModifiers.HasFlag(SystemHotKey.ModifierKeys.Alt))
+                    builder.Append("ALT + ");
+
+                if (HotkeyModifiers.HasFlag(SystemHotKey.ModifierKeys.Windows))
+                    builder.Append("WIN + ");
+
+                builder.Append(Hotkey.ToString());
+
+                return builder.ToString();
+            }
+        }
+
+        public static bool IsHotkeyEnabled
+        {
+            get
+            {
+                return _hotkeyEnabled;
+            }
+            set
+            {
+                _hotkeyEnabled = value;
             }
         }
 
@@ -280,6 +348,10 @@ namespace WinBMA.Settings
 
             _lastUpdateCheck = DateTime.MinValue;
             _checkForUpdates = true;
+
+            _hotkeyModifiers = SystemHotKey.ModifierKeys.Windows;
+            _hotkey = Keys.Enter;
+            _hotkeyEnabled = true;
         }
 
         public static void Load()
@@ -304,7 +376,7 @@ namespace WinBMA.Settings
 
                 int fileVersion = binReader.ReadInt32();
 
-                if (fileVersion > 3)
+                if (fileVersion > 4)
                 {
                     System.Windows.MessageBox.Show("The settings database was created with a newer version of WinBMA. We were unable to load your settings.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     return;
@@ -368,6 +440,13 @@ namespace WinBMA.Settings
 
                 _checkForUpdates = binReader.ReadBoolean();
                 _lastUpdateCheck = DateTime.FromBinary(binReader.ReadInt64());
+
+                if (fileVersion == 3)
+                    return;
+
+                _hotkeyEnabled = binReader.ReadBoolean();
+                _hotkeyModifiers = (Utilities.SystemHotKey.ModifierKeys)binReader.ReadByte();
+                _hotkey = (Utilities.Keys)binReader.ReadInt32();
             }
         }
 
@@ -376,7 +455,7 @@ namespace WinBMA.Settings
             using (BinaryWriter binWriter = new BinaryWriter(File.Create(SettingsFile)))
             {
                 binWriter.Write("WINBMACFG".ToCharArray());
-                binWriter.Write(3);
+                binWriter.Write(4);
                 binWriter.Write(Authenticators.Count);
 
                 foreach (AuthAPI.Authenticator auth in Authenticators)
@@ -402,6 +481,10 @@ namespace WinBMA.Settings
                 binWriter.Write(Theme);
                 binWriter.Write(CheckForUpdates);
                 binWriter.Write(LastUpdateCheck.ToBinary());
+
+                binWriter.Write(IsHotkeyEnabled);
+                binWriter.Write((byte)HotkeyModifiers);
+                binWriter.Write((int)Hotkey);
             }
         }
     }

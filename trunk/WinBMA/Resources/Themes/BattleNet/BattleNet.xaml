@@ -78,6 +78,7 @@
 
                                             <MenuItem x:Name="PART_Mnu_AlwaysOnTop" IsCheckable="True" Header="Always On Top" />
                                             <MenuItem x:Name="PART_Mnu_AutoClipboard" IsCheckable="True" Header="Automatically Copy Code to Clipboard" />
+                                            <MenuItem x:Name="PART_Mnu_GlobalHotkey" Header="Enable Global Hotkey" />
                                             <MenuItem x:Name="PART_Mnu_AutoSync" IsCheckable="True" Header="Sync Clocks once a week" />
                                             <MenuItem x:Name="PART_Mnu_AutoCheckUpdates" IsCheckable="True" Header="Check for Updates once a week" />
                                         </MenuItem>

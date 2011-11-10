@@ -26,7 +26,6 @@ using System.Windows;
 
 namespace WinBMA
 {
-    /// </summary>
     public partial class App : Application
     {
         public static string AppPath
@@ -47,14 +46,22 @@ namespace WinBMA
 
                 if (!(assemblyVersion.Build < 730) && !(assemblyVersion.Revision == 0))
                 {
-                    _buildDate = new DateTime(2000, 1, 1, 0, 0, 0).AddDays(assemblyVersion.Build).AddSeconds(assemblyVersion.Revision * 2);
+                    _buildDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Unspecified).AddDays(assemblyVersion.Build).AddSeconds(assemblyVersion.Revision * 2);
 
-                    if (TimeZone.IsDaylightSavingTime(_buildDate, TimeZone.CurrentTimeZone.GetDaylightChanges(_buildDate.Year)))
+                    try
                     {
-                        _buildDate = _buildDate.AddHours(1);
-                    }
+                        TimeZoneInfo tziEastern = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
-                    if (_buildDate > DateTime.Now.AddMinutes(2) | _buildDate < new DateTime(2000, 1, 1, 0, 0, 0))
+                        if (tziEastern.IsDaylightSavingTime(_buildDate))
+                            _buildDate = _buildDate.AddHours(1);
+
+                        _buildDate = _buildDate.Subtract(tziEastern.GetUtcOffset(_buildDate));
+                    }
+                    catch (Exception) { }
+
+                    _buildDate = new DateTime(_buildDate.Ticks, DateTimeKind.Utc);
+
+                    if (_buildDate > DateTime.UtcNow.AddMinutes(2) | _buildDate < new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc))
                     {
                         _buildDate = DateTime.MinValue;
                     }

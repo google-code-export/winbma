@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using WinBMA.Utilities;
 
 namespace WinBMA.UI.Controls
 {
@@ -49,6 +50,7 @@ namespace WinBMA.UI.Controls
             }
         }
 
+        private Utilities.SystemHotKey HOTKEY_system;
         private bool _ignoreIndexChange = false;
         private Button PART_Btn_Code;
         private Button PART_Btn_ContextMenuTarget;
@@ -66,6 +68,7 @@ namespace WinBMA.UI.Controls
         private MenuItem PART_Mnu_CheckUpdates;
         private MenuItem PART_Mnu_Exit;
         private MenuItem PART_Mnu_Export;
+        private MenuItem PART_Mnu_GlobalHotkey;
         private MenuItem PART_Mnu_Import;
         private MenuItem PART_Mnu_New;
         private MenuItem PART_Mnu_Properties;
@@ -187,6 +190,14 @@ namespace WinBMA.UI.Controls
             }
         }
 
+        private void HOTKEY_system_HotKeyPressed(object sender, SystemHotKeyEventArgs e)
+        {
+            if (Settings.SettingsDatabase.SelectedAuthenticator == null || !Settings.SettingsDatabase.SelectedAuthenticator.IsDecrypted)
+                return;
+
+            WindowsInput.InputSimulator.SimulateTextEntry(PART_Btn_Code.Content.ToString());
+        }
+
         private void LoadAuthenticator(int index)
         {
             Settings.SettingsDatabase.SelectedAuthenticatorIndex = index;
@@ -241,6 +252,7 @@ namespace WinBMA.UI.Controls
             PART_Mnu_Properties = this.Template.FindName("PART_Mnu_Properties", this) as MenuItem;
             PART_Mnu_AlwaysOnTop = this.Template.FindName("PART_Mnu_AlwaysOnTop", this) as MenuItem;
             PART_Mnu_AutoClipboard = this.Template.FindName("PART_Mnu_AutoClipboard", this) as MenuItem;
+            PART_Mnu_GlobalHotkey = this.Template.FindName("PART_Mnu_GlobalHotkey", this) as MenuItem;
             PART_Mnu_AutoSync = this.Template.FindName("PART_Mnu_AutoSync", this) as MenuItem;
             PART_Mnu_AutoCheckUpdates = this.Template.FindName("PART_Mnu_AutoCheckUpdates", this) as MenuItem;
             PART_Mnu_Themes = this.Template.FindName("PART_Mnu_Themes", this) as MenuItem;
@@ -290,6 +302,13 @@ namespace WinBMA.UI.Controls
                 PART_Mnu_AutoClipboard.IsChecked = Settings.SettingsDatabase.AutoCopyToClipboard;
                 PART_Mnu_AutoClipboard.Checked += new RoutedEventHandler(PART_Mnu_AutoClipboard_Changed);
                 PART_Mnu_AutoClipboard.Unchecked += new RoutedEventHandler(PART_Mnu_AutoClipboard_Changed);
+            }
+
+            if (PART_Mnu_GlobalHotkey != null)
+            {
+                PART_Mnu_GlobalHotkey.IsChecked = Settings.SettingsDatabase.IsHotkeyEnabled;
+                PART_Mnu_GlobalHotkey.Header = "Enable Global Hotkey (" + Settings.SettingsDatabase.HotkeyString + ")";
+                PART_Mnu_GlobalHotkey.Click += new RoutedEventHandler(PART_Mnu_GlobalHotkey_Click);
             }
 
             if (PART_Mnu_AutoSync != null)
@@ -387,6 +406,13 @@ namespace WinBMA.UI.Controls
             {
                 CheckForUpdates(true);
             }
+
+            HOTKEY_system = new SystemHotKey(App.MainAppWindow);
+            HOTKEY_system.HotKeyPressed += new EventHandler<SystemHotKeyEventArgs>(HOTKEY_system_HotKeyPressed);
+
+            HOTKEY_system.Modifiers = Settings.SettingsDatabase.HotkeyModifiers;
+            HOTKEY_system.Key = Settings.SettingsDatabase.Hotkey;
+            HOTKEY_system.Enabled = Settings.SettingsDatabase.IsHotkeyEnabled;
         }
 
         private void PART_Btn_Code_Click(object sender, RoutedEventArgs e)
@@ -497,6 +523,35 @@ namespace WinBMA.UI.Controls
             winExport.Topmost = App.MainAppWindow.Topmost;
 
             winExport.ShowDialog();
+        }
+
+        private void PART_Mnu_GlobalHotkey_Click(object sender, RoutedEventArgs e)
+        {
+            EditHotKeyWindow winEditHotKey = new EditHotKeyWindow();
+            winEditHotKey.Owner = App.MainAppWindow;
+            winEditHotKey.Topmost = App.MainAppWindow.Topmost;
+
+            winEditHotKey.ShowDialog();
+
+            if (winEditHotKey.DialogResult == true)
+            {
+                HOTKEY_system.Enabled = false;
+
+                Settings.SettingsDatabase.IsHotkeyEnabled = (bool)winEditHotKey.CHECK_EnableHotkey.IsChecked;
+
+                if (Settings.SettingsDatabase.IsHotkeyEnabled)
+                {
+                    Settings.SettingsDatabase.HotkeyModifiers = winEditHotKey.ModifierKeys;
+                    Settings.SettingsDatabase.Hotkey = winEditHotKey.Keys;
+
+                    HOTKEY_system.Modifiers = Settings.SettingsDatabase.HotkeyModifiers;
+                    HOTKEY_system.Key = Settings.SettingsDatabase.Hotkey;
+                    HOTKEY_system.Enabled = Settings.SettingsDatabase.IsHotkeyEnabled;
+                }
+
+                PART_Mnu_GlobalHotkey.IsChecked = Settings.SettingsDatabase.IsHotkeyEnabled;
+                PART_Mnu_GlobalHotkey.Header = "Enable Global Hotkey (" + Settings.SettingsDatabase.HotkeyString + ")";
+            }
         }
 
         private void PART_Mnu_Import_Click(object sender, RoutedEventArgs e)
