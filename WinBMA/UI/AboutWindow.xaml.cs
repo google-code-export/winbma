@@ -21,6 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+using System;
 using System.Windows;
 
 namespace WinBMA.UI
@@ -32,7 +33,7 @@ namespace WinBMA.UI
             InitializeComponent();
 
             TEXTBLOCK_Version.Text = App.Version.ToString();
-            TEXTBLOCK_BuildDate.Text = App.BuildDate.ToString();
+            TEXTBLOCK_BuildDate.Text = GetFormattedBuildDate();
 
             TEXT_License.Text = Utilities.TextResourceReader.GetFromResources("/WinBMA;component/Resources/License.txt");
 
@@ -51,6 +52,11 @@ namespace WinBMA.UI
         {
             this.DialogResult = true;
             this.Close();
+        }
+
+        private string GetFormattedBuildDate()
+        {
+            return String.Format("{0:ddd, dd MMM yyyy HH':'mm':'ss zzz}", App.BuildDate.ToLocalTime());
         }
 
         private void LINK_HomePage_Click(object sender, RoutedEventArgs e)
