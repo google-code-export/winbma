@@ -1,0 +1,272 @@
+﻿<Window x:Class="WinBMA.UI.ImportAuthWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wpfx="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit.Extended"
+        xmlns:wpfxc="clr-namespace:Microsoft.Windows.Controls.Core.Converters;assembly=WPFToolkit.Extended"
+        xmlns:u="clr-namespace:WinBMA.Utilities"
+        Title="Import Authenticator Wizard" Icon="/WinBMA;component/Resources/Images/Icons/WinBMA.ico"
+        ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        Closing="Window_Closing"
+        Height="400" Width="500">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="CONV_BoolToVisibility" />
+        <wpfxc:InverseBoolConverter x:Key="CONV_BoolInverse" />
+        <u:CombiningConverter x:Key="CONV_Combine" FirstConverter="{StaticResource CONV_BoolInverse}" SecondConverter="{StaticResource CONV_BoolToVisibility}" />
+    </Window.Resources>
+    <wpfx:Wizard x:Name="WIZARD" BorderThickness="0" HelpButtonVisibility="Hidden" FinishButtonClosesWindow="True" CanFinish="True" CancelButtonClosesWindow="True" IsTabStop="False">
+        <wpfx:WizardPage x:Name="WIZARDPAGE_Welcome"
+                         BackButtonVisibility="Hidden"
+                         FinishButtonVisibility="Hidden"
+                         Title="Import Authenticator"
+                         PageType="Exterior"
+                         IsTabStop="False">
+            <wpfx:WizardPage.ExteriorPanelBackground>
+                <ImageBrush ImageSource="/WinBMA;component/Resources/Images/background_exterior_wizard.png" Stretch="Fill" TileMode="None" />
+            </wpfx:WizardPage.ExteriorPanelBackground>
+
+            <wpfx:WizardPage.Content>
+                <TextBlock TextWrapping="Wrap">
+                    Welcome to the <Bold>Import Authenticator</Bold> Wizard.<LineBreak /><LineBreak />
+
+                    This wizard will guide you through the steps required to import an authenticator for use within WinBMA.<LineBreak /><LineBreak />
+
+                    To continue, click Next.
+                </TextBlock>
+            </wpfx:WizardPage.Content>
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_SelectFile"
+                         CancelButtonVisibility="Hidden"
+                         BackButtonVisibility="Hidden"
+                         NextButtonVisibility="Hidden"
+                         FinishButtonVisibility="Hidden"
+                         Title="Import Authenticator"
+                         Description="Selecting File"
+                         PageType="Interior"
+                         IsTabStop="False"
+                         >
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_Protect"
+                         BackButtonVisibility="Hidden"
+                         FinishButtonVisibility="Hidden"
+                         Title="Import Authenticator"
+                         Description="Encryption Method Selection"
+                         PageType="Interior"
+                         IsTabStop="False">
+            <wpfx:WizardPage.Content>
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">
+                        Encrypting your authenticator data adds an additional layer of security, preventing malicious programs from
+                        stealing your authenticator tokens out of the WinBMA database. You may choose none, one, or multiple encryption layers.
+                    </TextBlock>
+
+                    <StackPanel Margin="12,12,12,0">
+                        <CheckBox x:Name="CHECK_ProtectPassword" FontWeight="Bold" Padding="10,0,0,0"  Content="Protect using Password"></CheckBox>
+                        <Grid Margin="24,6,24,12"
+                                    IsEnabled="{Binding ElementName=CHECK_ProtectPassword, Path=IsChecked}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Label Content="Password:" HorizontalContentAlignment="Right" Grid.Column="0" Grid.Row="0" />
+                            <PasswordBox u:PasswordBoxAssistant.BindPassword="True"
+                                         u:PasswordBoxAssistant.BoundPassword="{Binding ElementName=TEXT_Password, Path=Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0"
+                                         Visibility="{Binding ElementName=CHECK_ShowPassword, Path=IsChecked, Converter={StaticResource CONV_Combine}}"/>
+                            <TextBox x:Name="TEXT_Password" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0"
+                                     Visibility="{Binding ElementName=CHECK_ShowPassword, Path=IsChecked, Converter={StaticResource CONV_BoolToVisibility}}"/>
+                            <CheckBox x:Name="CHECK_ShowPassword" Margin="0,3,0,0" Grid.Column="1" Grid.Row="1" Padding="5,0,0,0"  Content="Show Password" />
+                        </Grid>
+                        <CheckBox x:Name="CHECK_ProtectWindows" FontWeight="Bold" Padding="10,0,0,0"  Content="Protect using Windows Credentials"></CheckBox>
+                        <StackPanel Margin="24,6,24,12"
+                                    IsEnabled="{Binding ElementName=CHECK_ProtectWindows, Path=IsChecked}"
+                                    >
+                            <RadioButton x:Name="RADIO_ProtectCurrentUser" IsChecked="True" Padding="5,0,0,0">
+                                <TextBlock>Lock to current user (<TextBlock x:Name="TEXTBLOCK_CurrentUser"></TextBlock>)</TextBlock>
+                            </RadioButton>
+                            <RadioButton x:Name="RADIO_ProtectLocalMachine" Margin="0,5,0,0"  Padding="5,0,0,0">
+                                <TextBlock>Lock to local machine (<TextBlock x:Name="TEXTBLOCK_LocalMachine"></TextBlock>)</TextBlock>
+                            </RadioButton>
+                        </StackPanel>
+                        <Label x:Name="LABEL_NoEncryptionWarning" Foreground="DarkRed">
+                            <TextBlock>
+                                <Bold>WARNING: </Bold> Authenticator token will be stored in plain text.
+                            </TextBlock>
+                        </Label>
+                    </StackPanel>
+                </StackPanel>
+            </wpfx:WizardPage.Content>
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_Name"
+                         FinishButtonVisibility="Hidden"
+                         Title="Import Authenticator"
+                         Description="Name Your Authenticator"
+                         PageType="Interior"
+                         IsTabStop="False"
+                         >
+            <wpfx:WizardPage.Content>
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">
+                        Naming your authenticator will allow you to easily find it in the menu. If you do not name your authenticator, its serial number will be used instead.
+                    </TextBlock>
+
+                    <Grid Margin="12,12,12,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Content="Name:" HorizontalContentAlignment="Right" Grid.Column="0" />
+                        <wpfx:WatermarkTextBox x:Name="TEXT_FriendlyName" Watermark="(Serial will be used)" Grid.Column="1" VerticalContentAlignment="Center" />
+                    </Grid>
+                </StackPanel>
+            </wpfx:WizardPage.Content>
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_SettingsSummary"
+                         FinishButtonVisibility="Hidden"
+                         Title="Import Authenticator"
+                         Description="Setting Summary"
+                         PageType="Interior"
+                         IsTabStop="False"
+                         >
+            <wpfx:WizardPage.Content>
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">
+                        Your authenticator will be imported with the following settings:
+                    </TextBlock>
+
+                    <Grid Margin="12,12,12,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Encryption Type:" FontWeight="Bold" HorizontalContentAlignment="Right" Grid.Column="0" Grid.Row="0" />
+                        <Label x:Name="LABEL_EncryptionType" IsEnabled="False" Content="(None)" Grid.Column="1" Grid.Row="0" />
+
+                        <Label Content="Name:" FontWeight="Bold" HorizontalContentAlignment="Right" Grid.Column="0" Grid.Row="1" />
+                        <Label x:Name="LABEL_FriendlyName" IsEnabled="False" Content="(Serial will be used)" Grid.Column="1" Grid.Row="1" />
+                    </Grid>
+
+                    <TextBlock Margin="0,12,0,0" TextWrapping="Wrap">
+                        If those settings are correct, please click Next to import your authenticator.
+                    </TextBlock>
+                </StackPanel>
+            </wpfx:WizardPage.Content>
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_Progress"
+                         CancelButtonVisibility="Hidden"
+                         BackButtonVisibility="Hidden"
+                         NextButtonVisibility="Hidden"
+                         FinishButtonVisibility="Hidden"
+                         Title="Import Authenticator"
+                         Description="Importing"
+                         PageType="Interior"
+                         IsTabStop="False"
+                         >
+            <wpfx:WizardPage.Content>
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">
+                        Please wait while your authenticator is being imported.
+                    </TextBlock>
+
+                    <Grid Margin="12,24,12,0" VerticalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Label x:Name="LABEL_CurrentTask" Content="Task" Grid.Row="0" />
+                        <ProgressBar x:Name="PROGRESS_Tasks" Height="18" Minimum="0" Maximum="2" Grid.Row="1" />
+                    </Grid>
+                </StackPanel>
+            </wpfx:WizardPage.Content>
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_Success"
+                         CancelButtonVisibility="Hidden"
+                         BackButtonVisibility="Hidden"
+                         NextButtonVisibility="Hidden"
+                         FinishButtonVisibility="Visible"
+                         CanFinish="True"
+                         Title="Authenticator Imported!"
+                         Description="Your authenticator has been imported successfully and is now accessible from the main menu."
+                         PageType="Exterior"
+                         IsTabStop="False">
+            <wpfx:WizardPage.ExteriorPanelBackground>
+                <ImageBrush ImageSource="/WinBMA;component/Resources/Images/background_exterior_wizard.png" Stretch="Fill" TileMode="None" />
+            </wpfx:WizardPage.ExteriorPanelBackground>
+
+            <wpfx:WizardPage.Content>
+                <Grid VerticalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock TextWrapping="Wrap" Grid.Row="0">
+                        Please take note of the following information. This will allow you to restore your authenticator and transfer it to another device if needed.
+                    </TextBlock>
+
+                    <Grid Margin="0,12,0,0" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Serial:" FontWeight="Bold" HorizontalContentAlignment="Right" Grid.Column="0" Grid.Row="0" />
+                        <TextBox x:Name="TEXT_Serial" FontSize="14" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Cursor="Hand"
+                                 IsReadOnly="True" IsReadOnlyCaretVisible="False" IsTabStop="False" Grid.Column="1" Grid.Row="0" />
+
+                        <Label Content="Restore Code:" Margin="0,3,0,0" FontWeight="Bold" HorizontalContentAlignment="Right" Grid.Column="0" Grid.Row="1" />
+                        <TextBox x:Name="TEXT_RestoreCode" FontSize="14" Margin="0,3,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Cursor="Hand"
+                                 IsReadOnly="True" IsReadOnlyCaretVisible="False" IsTabStop="False" Grid.Column="1" Grid.Row="1" />
+
+                        <TextBlock Margin="0,3,0,0" Grid.Column="2" Grid.Row="3">
+                            <Hyperlink x:Name="LINK_CopyToClipboard">Copy all to Clipboard</Hyperlink>
+                        </TextBlock>
+                    </Grid>
+
+                    <TextBlock VerticalAlignment="Bottom" Grid.Row="2">
+                        <Hyperlink x:Name="LINK_AddHelp">How do I add this authenticator to Battle.net?</Hyperlink>
+                    </TextBlock>
+                </Grid>
+            </wpfx:WizardPage.Content>
+        </wpfx:WizardPage>
+
+        <wpfx:WizardPage x:Name="WIZARDPAGE_Fail"
+                         CancelButtonVisibility="Hidden"
+                         BackButtonVisibility="Hidden"
+                         NextButtonVisibility="Hidden"
+                         FinishButtonVisibility="Visible"
+                         CanFinish="True"
+                         Title="Failed to Import Authenticator"
+                         Description="The wizard has failed to import the authenticator. Please try again at a later time."
+                         PageType="Exterior">
+            <wpfx:WizardPage.ExteriorPanelBackground>
+                <ImageBrush ImageSource="/WinBMA;component/Resources/Images/background_exterior_wizard.png" Stretch="Fill" TileMode="None" />
+            </wpfx:WizardPage.ExteriorPanelBackground>
+        </wpfx:WizardPage>
+    </wpfx:Wizard>
+</Window>
