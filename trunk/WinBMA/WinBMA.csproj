@@ -214,7 +214,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <Resource Include="Resources\Fonts\Envy Code R.ttf" />
     <Resource Include="Resources\Themes\BlizzardMobile\DroidSans.ttf" />
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +272,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\License.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Fonts\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
