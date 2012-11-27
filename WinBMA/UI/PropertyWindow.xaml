@@ -137,7 +137,7 @@
                     <Separator Margin="0,6" Grid.Row="2" Grid.ColumnSpan="2" />
 
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Grid.ColumnSpan="2">
-                        <TextBlock x:Name="TEXTBLOCK_TokenInspector" FontFamily="/WinBMA;component/Resources/Fonts/Envy Code R.ttf#Envy Code R" FontSize="13" />
+                        <TextBlock x:Name="TEXTBLOCK_TokenInspector" FontFamily="Courier New" FontSize="13" />
                     </Grid>
                 </Grid>
             </TabItem>
